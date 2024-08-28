@@ -136,7 +136,7 @@ Give a ⭐️ if you like this project!
 
 ## Acknowledgments
 
-- Thanks to my mentor [@Snaaimy](https://github.com/Snaaimy)for his valuable feedback and support throughout the development process.
+- Thanks to my mentor [@Snaaimy](https://github.com/Snaaimy) for his valuable feedback and support throughout the development process.
 - A big thank you to the open-source community for the tools and resources that made this project possible.
 
 ## 📝 License
