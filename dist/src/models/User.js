@@ -26,22 +26,11 @@ exports.User = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const UserRole_1 = require("./UserRole");
 const Role_1 = require("./Role");
+const Post_1 = require("./Post");
+const Comment_1 = require("./Comment");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const jwtUtils_1 = require("../utils/jwtUtils");
+const jwtservices_1 = require("../services/jwtservices");
 let User = User_1 = class User extends sequelize_typescript_1.Model {
-    getUserById(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                return yield User_1.findOne({
-                    where: { id: id },
-                });
-            }
-            catch (error) {
-                console.log(error);
-                throw error;
-            }
-        });
-    }
     addUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -112,7 +101,7 @@ let User = User_1 = class User extends sequelize_typescript_1.Model {
     }
     generateAuthToken() {
         return __awaiter(this, void 0, void 0, function* () {
-            return (0, jwtUtils_1.generateToken)(this.id);
+            return (0, jwtservices_1.generateToken)(this.id);
         });
     }
 };
@@ -146,6 +135,14 @@ __decorate([
     (0, sequelize_typescript_1.BelongsToMany)(() => Role_1.Role, () => UserRole_1.UserRole),
     __metadata("design:type", Array)
 ], User.prototype, "roles", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => Post_1.Post),
+    __metadata("design:type", Array)
+], User.prototype, "posts", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => Comment_1.Comment),
+    __metadata("design:type", Array)
+], User.prototype, "comments", void 0);
 exports.User = User = User_1 = __decorate([
     (0, sequelize_typescript_1.Scopes)(() => ({
         withRoles: {
@@ -159,4 +156,14 @@ exports.User = User = User_1 = __decorate([
     })),
     (0, sequelize_typescript_1.Table)({ tableName: "user" })
 ], User);
+// public async getUserById(id: number) {
+//   try {
+//     return await User.findOne({
+//       where: { id: id },
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     throw error;
+//   }
+// }
 //# sourceMappingURL=User.js.map

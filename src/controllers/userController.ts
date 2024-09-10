@@ -7,17 +7,19 @@ import { Permission, Role, RolePermission, User, UserRole } from '../models';
 
   addUser = async (req: Request, res: Response) => {
     try {
+      console.log('Request Body:', req.body); // Add this line
       const { email, password, first_name, last_name } = req.body;
       const user = new User({ email, first_name, last_name });
       await user.setPassword(password);
       const result = await user.save();
       res.status(201).json({ message: 'User registered successfully', user: result });
     } catch (error) {
-      console.log(error);
+      console.error('Error creating user:', error); // Log the error details
+
       res.status(500).send('Server Error');
     }
   }
-
+  
    login = async (req: Request, res: Response) => {
     try {
       const { email, password } = req.body;
@@ -116,6 +118,29 @@ import { Permission, Role, RolePermission, User, UserRole } from '../models';
 
 const usercontroller : UserController = new  UserController() ;
 export default usercontroller ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

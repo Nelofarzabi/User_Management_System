@@ -29,14 +29,17 @@ class UserController {
             try {
                 const { email, password } = req.body;
                 const user = yield models_1.User.findOne({ where: { email } });
-                if (!user || !(yield user.validatePassword(password))) {
+                if (!user) {
+                    return res.status(401).send('User not exist');
+                }
+                const isPasswordValid = yield user.validatePassword(password);
+                if (!isPasswordValid) {
                     return res.status(401).send('User not exist');
                 }
                 const token = yield user.generateAuthToken();
-                res.json({ token });
+                res.status(200).json({ token });
             }
             catch (error) {
-                console.log(error);
                 res.status(500).send('Server Error');
             }
         });
@@ -118,4 +121,18 @@ class UserController {
 }
 const usercontroller = new UserController();
 exports.default = usercontroller;
+// login = async (req: Request, res: Response) => {
+//   try {
+//     const { email, password } = req.body;
+//     const user = await User.findOne({ where: { email } });
+//     if (!user || !(await user.validatePassword(password))) {
+//       return res.status(401).send('User not exist');
+//     }
+//     const token = await user.generateAuthToken();
+//     res.json({ token });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).send('Server Error');
+//   }
+// }
 //# sourceMappingURL=userController.js.map

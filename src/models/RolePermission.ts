@@ -24,5 +24,5 @@ import {
 
     @BelongsTo(() => Permission)
     permission: Permission;
-  }
+}
   

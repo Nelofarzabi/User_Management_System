@@ -20,7 +20,7 @@ const umzug = () => __awaiter(void 0, void 0, void 0, function* () {
                 {
                     // the name of the migration is mandatory
                     //after migration this should ne application
-                    name: "000014-main-migration-roles-permissions",
+                    name: "000015-main-migration-posts-comments-tables",
                     up(_a) {
                         return __awaiter(this, arguments, void 0, function* ({ context }) {
                             // for deleting all contents of database change the force option to true
@@ -31,7 +31,7 @@ const umzug = () => __awaiter(void 0, void 0, void 0, function* () {
                     },
                     down(_a) {
                         return __awaiter(this, arguments, void 0, function* ({ context }) {
-                            console.log("down 0000-main-migration-roles-permissions");
+                            console.log("down 0000-main-migration-posts-comments-tables");
                         });
                     },
                 },

@@ -6,7 +6,7 @@ import usercontroller from '../controllers/userController';
 
 const router: Router = express.Router();
 
-router.post('/add-user', usercontroller.addUser);
+router.post('/add-user', validate(userValidations.addUser), usercontroller.addUser);
 router.post('/login', usercontroller.login); 
 router.get('/get-user', usercontroller.getUser);
 router.delete("/delete/:id", usercontroller.deleteUser);

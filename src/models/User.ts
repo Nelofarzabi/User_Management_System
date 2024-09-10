@@ -13,8 +13,10 @@ import {
 import { ICreateUser } from "../interfaces/user.interface";
 import { UserRole } from "./UserRole";
 import { Role } from "./Role";
+import { Post } from './Post';
+import { Comment } from './Comment';
 import bcrypt from 'bcryptjs';
-import { generateToken } from '../utils/jwtUtils';
+import { generateToken } from '../services/jwtservices';
 
 @Scopes(() => ({
   withRoles: {
@@ -53,6 +55,13 @@ export class User extends Model<User> {
 
   @BelongsToMany(() => Role, () => UserRole)
   roles: Role[];
+
+    
+  @HasMany(() => Post)
+  posts: Post[];
+  
+  @HasMany(() => Comment)
+  comments: Comment[];
 
   public async addUser(user:ICreateUser){
     try {

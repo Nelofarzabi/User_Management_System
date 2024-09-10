@@ -45,6 +45,5 @@ import { Permission } from "./Permission";
   
     @BelongsToMany(() => Permission, () => RolePermission)
     permissions: Permission[];
-  
-  }
+}
   

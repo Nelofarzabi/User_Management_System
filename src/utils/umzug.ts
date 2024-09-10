@@ -1,6 +1,5 @@
 import { Umzug, SequelizeStorage } from "umzug";
 import { sequelize } from "../config/database";
-import { Models } from "../models";
 
 export const umzug = async () => {
     try {
@@ -11,7 +10,7 @@ export const umzug = async () => {
             {
               // the name of the migration is mandatory
               //after migration this should ne application
-              name: "000014-main-migration-roles-permissions",
+              name: "000015-main-migration-posts-comments-tables",
               async up({ context }) {
                 // for deleting all contents of database change the force option to true
                 const forceOption = true;
@@ -20,7 +19,7 @@ export const umzug = async () => {
                 
               },
               async down({ context }) {
-                console.log("down 0000-main-migration-roles-permissions");
+                console.log("down 0000-main-migration-posts-comments-tables");
               },
             },
           ],

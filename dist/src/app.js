@@ -12,12 +12,9 @@ const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = config_1.default.port || 3000;
-// parse json request body
 app.use(express_1.default.json());
-// parse urlencoded request body
 app.use(express_1.default.urlencoded({ extended: true }));
 app.set('views', path_1.default.join(__dirname, 'views'));
-// enable cors
 app.use((0, cors_1.default)());
 app.options("*", (0, cors_1.default)());
 app.use('/api/v1', routes_1.default);
