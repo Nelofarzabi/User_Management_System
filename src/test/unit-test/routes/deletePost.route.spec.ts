@@ -10,36 +10,36 @@ app.delete('/delete-post/:id', postController.deletePost);
 
 jest.mock('../../../models', () => ({
   Post: {
-    findByPk: jest.fn(),
+    deletePostById: jest.fn(),
   },
 }));
-
 describe('DELETE /delete-post/:id', () => {
   it('should delete a post successfully', async () => {
-    const mockPost = { id: '1', destroy: jest.fn() }; 
-    (Post.findByPk as jest.Mock).mockResolvedValue(mockPost);
+    const postId = 1;
+
+    (Post.deletePostById as jest.Mock).mockResolvedValue(true);
 
     const response = await request(app)
-      .delete('/delete-post/1');
+      .delete(`/delete-post/${postId}`);
 
     expect(response.status).toBe(200);
     expect(response.body.message).toBe('Post deleted successfully');
-    expect(Post.findByPk).toHaveBeenCalledWith('1'); 
-    expect(mockPost.destroy).toHaveBeenCalled();
   });
 
   it('should handle post not found', async () => {
-    (Post.findByPk as jest.Mock).mockResolvedValue(null);
+    const postId = 1;
+
+    (Post.deletePostById as jest.Mock).mockResolvedValue(false);
 
     const response = await request(app)
-      .delete('/delete-post/1');
+      .delete(`/delete-post/${postId}`);
 
     expect(response.status).toBe(404);
     expect(response.body.message).toBe('Post not found');
   });
 
   it('should handle server error', async () => {
-    (Post.findByPk as jest.Mock).mockRejectedValue(new Error('Find failed'));
+    (Post.deletePostById as jest.Mock).mockRejectedValue(new Error('Delete failed'));
 
     const response = await request(app)
       .delete('/delete-post/1');

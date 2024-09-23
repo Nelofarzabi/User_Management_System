@@ -1,14 +1,11 @@
 import { Request, Response } from 'express';
 import postController from '../../../controllers/postController'; 
-import { Post, Comment, User } from '../../../models'; 
-
+import { Post } from '../../../models'; 
 
 jest.mock('../../../models', () => ({
   Post: {
-    findByPk: jest.fn(),
+    getPostById: jest.fn(),
   },
-  Comment: {},
-  User: {},
 }));
 
 describe('getPostById', () => {
@@ -33,35 +30,34 @@ describe('getPostById', () => {
     };
   });
 
-  it('should return a post by ID successfully', async () => {
+  it('should retrieve a post by ID successfully', async () => {
     const postMock = {
       id: 1,
-      title: 'Post 1',
-      content: 'Content 1',
-      userId: 1,
+      title: 'Post Title',
+      content: 'Post Content',
     };
 
-    (Post.findByPk as jest.Mock).mockResolvedValue(postMock);
+    (Post.getPostById as jest.Mock).mockResolvedValue(postMock);
 
     await postController.getPostById(req as Request, res as Response);
 
-    expect(Post.findByPk).toHaveBeenCalledWith('1', { include: [Comment, User] });
+    expect(Post.getPostById).toHaveBeenCalledWith(1);
     expect(statusMock).toHaveBeenCalledWith(200);
     expect(jsonMock).toHaveBeenCalledWith(postMock);
   });
 
   it('should return 404 if the post is not found', async () => {
-    (Post.findByPk as jest.Mock).mockResolvedValue(null);
+    (Post.getPostById as jest.Mock).mockResolvedValue(null);
 
     await postController.getPostById(req as Request, res as Response);
 
-    expect(Post.findByPk).toHaveBeenCalledWith('1', { include: [Comment, User] });
+    expect(Post.getPostById).toHaveBeenCalledWith(1);
     expect(statusMock).toHaveBeenCalledWith(404);
     expect(jsonMock).toHaveBeenCalledWith({ message: 'Post not found' });
   });
 
   it('should handle server error', async () => {
-    (Post.findByPk as jest.Mock).mockRejectedValue(new Error('Find by PK failed'));
+    (Post.getPostById as jest.Mock).mockRejectedValue(new Error('Find failed'));
 
     await postController.getPostById(req as Request, res as Response);
 

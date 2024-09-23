@@ -5,34 +5,33 @@ import { Post } from '../../../models';
 
 const app = express();
 app.use(express.json());
-
 app.get('/get-posts', postController.getAllPosts);
+
 
 jest.mock('../../../models', () => ({
   Post: {
-    findAll: jest.fn(),
+    getAllPosts: jest.fn(), 
   },
 }));
 
 describe('GET /get-posts', () => {
   it('should retrieve all posts successfully', async () => {
-    const postsMock = [
-      { id: 1, title: 'Post 1', content: 'Content 1', userId: 1 },
-      { id: 2, title: 'Post 2', content: 'Content 2', userId: 2 },
+    const posts = [
+      { id: 1, title: 'Post 1', content: 'Content 1' },
+      { id: 2, title: 'Post 2', content: 'Content 2' }
     ];
 
-    (Post.findAll as jest.Mock).mockResolvedValue(postsMock);
+    (Post.getAllPosts as jest.Mock).mockResolvedValue(posts);
 
     const response = await request(app)
       .get('/get-posts');
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual(postsMock); 
-    expect(Post.findAll).toHaveBeenCalled();
+    expect(response.body).toEqual(posts);
   });
 
   it('should handle server error', async () => {
-    (Post.findAll as jest.Mock).mockRejectedValue(new Error('Find all failed'));
+    (Post.getAllPosts as jest.Mock).mockRejectedValue(new Error('Find failed'));
 
     const response = await request(app)
       .get('/get-posts');

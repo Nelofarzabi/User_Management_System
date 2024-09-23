@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import commentController from '../../../controllers/commentController'; 
 import { Comment } from '../../../models'; 
-
+import { ICreateComment } from '../../../interfaces/comment.interface';
 
 jest.mock('../../../models', () => ({
   Comment: {
-    create: jest.fn(),
+    addComment: jest.fn(),
   },
 }));
 
@@ -23,13 +23,11 @@ describe('addComment', () => {
 
     req = {
       body: {
-        content: 'This is a test comment',
+        content: 'This is a new comment',
         userId: 1,
         postId: 1,
-        parentId: 1, 
-      },
+      } as ICreateComment,
     };
-
     res = {
       status: statusMock,
     };
@@ -38,31 +36,22 @@ describe('addComment', () => {
   it('should add a comment successfully', async () => {
     const commentMock = {
       id: 1,
-      content: 'This is a test comment',
+      content: 'This is a new comment',
       userId: 1,
       postId: 1,
-      parentId: 1,
     };
 
-    (Comment.create as jest.Mock).mockResolvedValue(commentMock);
+    (Comment.addComment as jest.Mock).mockResolvedValue(commentMock);
 
     await commentController.addComment(req as Request, res as Response);
 
-    expect(Comment.create).toHaveBeenCalledWith({
-      content: 'This is a test comment',
-      userId: 1,
-      postId: 1,
-      parentId: 1,
-    });
+    expect(Comment.addComment).toHaveBeenCalledWith(req.body);
     expect(statusMock).toHaveBeenCalledWith(201);
-    expect(jsonMock).toHaveBeenCalledWith({
-      message: 'Comment added successfully',
-      comment: commentMock,
-    });
+    expect(jsonMock).toHaveBeenCalledWith({ message: 'Comment added successfully', comment: commentMock });
   });
 
   it('should handle server error', async () => {
-    (Comment.create as jest.Mock).mockRejectedValue(new Error('Create failed'));
+    (Comment.addComment as jest.Mock).mockRejectedValue(new Error('Add comment failed'));
 
     await commentController.addComment(req as Request, res as Response);
 

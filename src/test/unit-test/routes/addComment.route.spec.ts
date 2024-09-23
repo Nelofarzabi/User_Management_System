@@ -1,27 +1,26 @@
 import request from 'supertest';
 import express from 'express';
-import commentController from '../../../controllers/commentController'; 
-import { Comment } from '../../../models'; 
-import validate from '../../../middlewares/validate'; 
-import { commentValidations } from '../../../validations/comment.validation'; 
+import commentRoutes from '../../../routes/comment.routes';
+import { Comment } from '../../../models';
 
+// Create and configure the Express app for testing
 const app = express();
 app.use(express.json());
+app.use(commentRoutes);
 
-app.post('/add-comment', validate(commentValidations.addComment), commentController.addComment);
-
+// Mock the Comment model
 jest.mock('../../../models', () => ({
   Comment: {
-    create: jest.fn(),
+    addComment: jest.fn(),
   },
 }));
 
 describe('POST /add-comment', () => {
   it('should add a comment successfully', async () => {
-    const commentData = { content: 'Great post!', userId: 1, postId: 1, parentId: 1};
-    const createdComment = { ...commentData, id: 1 };
+    const commentData = { content: 'New comment', userId: 1, postId: 1 };
+    const addedComment = { id: 1, ...commentData };
 
-    (Comment.create as jest.Mock).mockResolvedValue(createdComment);
+    (Comment.addComment as jest.Mock).mockResolvedValue(addedComment);
 
     const response = await request(app)
       .post('/add-comment')
@@ -29,18 +28,19 @@ describe('POST /add-comment', () => {
 
     expect(response.status).toBe(201);
     expect(response.body.message).toBe('Comment added successfully');
-    expect(response.body.comment).toEqual(createdComment);
+    expect(response.body.comment).toEqual(addedComment);
   });
 
-  it('should handle server error', async () => {
-    (Comment.create as jest.Mock).mockRejectedValue(new Error('Create failed'));
-  
+  it('should handle server error on adding a comment', async () => {
+    const commentData = { content: 'New comment', userId: 1, postId: 1 };
+
+    (Comment.addComment as jest.Mock).mockRejectedValue(new Error('Server error'));
+
     const response = await request(app)
       .post('/add-comment')
-      .send({ content: 'Great post!', userId: 1, postId: 1, parentId: null });
-  
+      .send(commentData);
+
     expect(response.status).toBe(500);
-    expect(response.text).toContain('Error'); 
+    expect(response.text).toBe('Server Error');
   });
-  
 });

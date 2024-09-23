@@ -1,15 +1,16 @@
 import { Request, Response } from 'express';
-import postController from '../../../controllers/postController'; 
-import { Post, Comment, User } from '../../../models'; 
+import postController from '../../../controllers/postController';
+import { Post } from '../../../models';
 
 jest.mock('../../../models', () => ({
   Post: {
-    findAll: jest.fn(),},
+    deletePostById: jest.fn(), 
+  },
   Comment: {},
   User: {},
 }));
 
-describe('getAllPosts', () => {
+describe('deletePost', () => {
   let req: Partial<Request>;
   let res: Partial<Response>;
   let jsonMock: jest.Mock;
@@ -21,31 +22,40 @@ describe('getAllPosts', () => {
     sendMock = jest.fn();
     statusMock = jest.fn().mockReturnValue({ json: jsonMock, send: sendMock });
 
-    req = {};
+    req = {
+      params: {
+        id: '1',
+      },
+    };
     res = {
       status: statusMock,
     };
   });
 
-  it('should return all posts successfully', async () => {
-    const postsMock = [
-      { id: 1, title: 'Post 1', content: 'Content 1', userId: 1 },
-      { id: 2, title: 'Post 2', content: 'Content 2', userId: 2 },
-    ];
+  it('should delete a post successfully', async () => {
+    (Post.deletePostById as jest.Mock).mockResolvedValue(true);
 
-    (Post.findAll as jest.Mock).mockResolvedValue(postsMock);
+    await postController.deletePost(req as Request, res as Response);
 
-    await postController.getAllPosts(req as Request, res as Response);
-
-    expect(Post.findAll).toHaveBeenCalledWith({ include: [Comment, User] });
+    expect(Post.deletePostById).toHaveBeenCalledWith(1); 
     expect(statusMock).toHaveBeenCalledWith(200);
-    expect(jsonMock).toHaveBeenCalledWith(postsMock);
+    expect(jsonMock).toHaveBeenCalledWith({ message: 'Post deleted successfully' });
+  });
+
+  it('should return 404 if the post is not found', async () => {
+    (Post.deletePostById as jest.Mock).mockResolvedValue(false);
+
+    await postController.deletePost(req as Request, res as Response);
+
+    expect(Post.deletePostById).toHaveBeenCalledWith(1); 
+    expect(statusMock).toHaveBeenCalledWith(404);
+    expect(jsonMock).toHaveBeenCalledWith({ message: 'Post not found' });
   });
 
   it('should handle server error', async () => {
-    (Post.findAll as jest.Mock).mockRejectedValue(new Error('Find all failed'));
+    (Post.deletePostById as jest.Mock).mockRejectedValue(new Error('Delete failed'));
 
-    await postController.getAllPosts(req as Request, res as Response);
+    await postController.deletePost(req as Request, res as Response);
 
     expect(statusMock).toHaveBeenCalledWith(500);
     expect(sendMock).toHaveBeenCalledWith('Server Error');

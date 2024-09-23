@@ -52,7 +52,6 @@ export class User extends Model<User> {
   @Column
   last_name: string;
 
-
   @BelongsToMany(() => Role, () => UserRole)
   roles: Role[];
 
@@ -67,16 +66,14 @@ export class User extends Model<User> {
     try {
         return await User.create(user);
       } catch (error) {
-        console.log(error);
         throw error;
       }
   }
 
-  public static  async getAllUser() {
+  public  static async getAllUser() {
     try {
       return await User.findAll();
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
@@ -91,7 +88,6 @@ export class User extends Model<User> {
         return false;
       }
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
@@ -106,11 +102,19 @@ export class User extends Model<User> {
         return null;
       }
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
 
+   public static async assignRoleToUser(userId: number, roleId: number) {
+    try {
+      return await UserRole.create({ user_id: userId, role_id: roleId });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  
   public async setPassword(password: string) {
     this.password = await bcrypt.hash(password, 10);
   }
@@ -124,17 +128,3 @@ export class User extends Model<User> {
   }
 
 }
-
-
-
-
-// public async getUserById(id: number) {
-  //   try {
-  //     return await User.findOne({
-  //       where: { id: id },
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //     throw error;
-  //   }
-  // }

@@ -1,29 +1,23 @@
 import request from 'supertest';
 import express from 'express';
-import commentController from '../../../controllers/commentController'; 
-import { Comment, User, Post } from '../../../models'; 
+import commentRoutes from '../../../routes/comment.routes';
+import { Comment } from '../../../models';
 
 const app = express();
 app.use(express.json());
-
-app.get('/get-comments', commentController.getAllComments);
+app.use(commentRoutes);
 
 jest.mock('../../../models', () => ({
   Comment: {
-    findAll: jest.fn(),
+    getAllComments: jest.fn(),
   },
-  User: {},
-  Post: {},
 }));
 
 describe('GET /get-comments', () => {
   it('should retrieve all comments successfully', async () => {
-    const comments = [
-      { id: 1, content: 'Great post!', userId: 1, postId: 1 },
-      { id: 2, content: 'Interesting read.', userId: 2, postId: 1 }
-    ];
+    const comments = [{ id: 1, content: 'Comment 1' }, { id: 2, content: 'Comment 2' }];
 
-    (Comment.findAll as jest.Mock).mockResolvedValue(comments);
+    (Comment.getAllComments as jest.Mock).mockResolvedValue(comments);
 
     const response = await request(app)
       .get('/get-comments');
@@ -32,8 +26,8 @@ describe('GET /get-comments', () => {
     expect(response.body).toEqual(comments);
   });
 
-  it('should handle server error', async () => {
-    (Comment.findAll as jest.Mock).mockRejectedValue(new Error('Find failed'));
+  it('should handle server error on retrieving comments', async () => {
+    (Comment.getAllComments as jest.Mock).mockRejectedValue(new Error('Server error'));
 
     const response = await request(app)
       .get('/get-comments');

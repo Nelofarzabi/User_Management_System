@@ -4,7 +4,7 @@ import { Post } from '../../../models';
 
 jest.mock('../../../models', () => ({
   Post: {
-    create: jest.fn(),
+    createPost: jest.fn(),
   },
 }));
 
@@ -41,11 +41,11 @@ describe('addPost', () => {
       userId: 1,
     };
 
-    (Post.create as jest.Mock).mockResolvedValue(postMock);
+    (Post.createPost as jest.Mock).mockResolvedValue(postMock);
 
     await postController.addPost(req as Request, res as Response);
 
-    expect(Post.create).toHaveBeenCalledWith({
+    expect(Post.createPost).toHaveBeenCalledWith({
       title: 'Test Post',
       content: 'This is a test post',
       userId: 1,
@@ -59,7 +59,7 @@ describe('addPost', () => {
   });
 
   it('should handle server error', async () => {
-    (Post.create as jest.Mock).mockRejectedValue(new Error('Create failed'));
+    (Post.createPost as jest.Mock).mockRejectedValue(new Error('Create failed'));
 
     await postController.addPost(req as Request, res as Response);
 

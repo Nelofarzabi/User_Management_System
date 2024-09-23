@@ -7,18 +7,15 @@ import { Permission, Role, RolePermission, User, UserRole } from '../models';
 
   addUser = async (req: Request, res: Response) => {
     try {
-      console.log('Request Body:', req.body); // Add this line
-      const { email, password, first_name, last_name } = req.body;
-      const user = new User({ email, first_name, last_name });
-      await user.setPassword(password);
-      const result = await user.save();
+      const  body  = req.body as ICreateUser;
+      const user = new User();
+      const result = await user.addUser(body);
       res.status(201).json({ message: 'User registered successfully', user: result });
     } catch (error) {
-      console.error('Error creating user:', error); // Log the error details
-
       res.status(500).send('Server Error');
     }
   }
+  
   
    login = async (req: Request, res: Response) => {
     try {
@@ -38,15 +35,16 @@ import { Permission, Role, RolePermission, User, UserRole } from '../models';
     }
   };
 
+
   getUser = async (req: Request, res: Response) => {
     try {
       const users = await User.getAllUser(); 
       res.status(200).json(users);
     } catch (error) {
-      console.log(error);
       res.status(500).send('server error');
     }
   }
+
 
   deleteUser = async (req: Request, res: Response) => {
     try {
@@ -58,7 +56,6 @@ import { Permission, Role, RolePermission, User, UserRole } from '../models';
         res.status(404).json({ message: "User not found" });
       }
     } catch (error) {
-      console.log(error);
       res.status(500).send("Server Error");
     }
   }
@@ -75,7 +72,6 @@ import { Permission, Role, RolePermission, User, UserRole } from '../models';
         res.status(404).json({ message: "User not found" });
       }
     } catch (error) {
-      console.log(error);
       res.status(500).send("Server Error");
     }
   }
@@ -84,13 +80,12 @@ import { Permission, Role, RolePermission, User, UserRole } from '../models';
   assignRole = async (req: Request, res: Response) => {
     try {
       const { userId, roleId } = req.body;
-      await UserRole.create({ user_id: userId, role_id: roleId });
-      res.status(200).json({ message: "Role assigned successfully" });
+      await User.assignRoleToUser(userId, roleId);
+      res.status(200).json({ message: 'Role assigned successfully' });
     } catch (error) {
-      console.log(error);
-      res.status(500).send("Server Error");
+      res.status(500).send('Server Error');
     }
-  };
+  }
 
 
   getUsersWithRoles = async (req: Request, res: Response) => {
@@ -98,7 +93,6 @@ import { Permission, Role, RolePermission, User, UserRole } from '../models';
       const usersWithRoles = await User.scope('withRoles').findAll();
       res.status(200).json(usersWithRoles);
     } catch (error) {
-      console.error(error);
       res.status(500).send('Server Error');
     }
   };
@@ -109,7 +103,6 @@ import { Permission, Role, RolePermission, User, UserRole } from '../models';
       const rolesWithPermissions = await Role.scope('withPermissions').findAll();
       res.status(200).json(rolesWithPermissions);
     } catch (error) {
-      console.log(error);
       res.status(500).send("Server Error");
     }
   }

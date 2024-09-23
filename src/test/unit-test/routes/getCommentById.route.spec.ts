@@ -1,49 +1,51 @@
 import request from 'supertest';
 import express from 'express';
-import commentController from '../../../controllers/commentController'; 
-import { Comment, User, Post } from '../../../models'; 
+import commentRoutes from '../../../routes/comment.routes';
+import { Comment } from '../../../models';
 
 const app = express();
 app.use(express.json());
-
-app.get('/get-comment/:id', commentController.getCommentById);
+app.use(commentRoutes);
 
 jest.mock('../../../models', () => ({
   Comment: {
-    findByPk: jest.fn(),
+    getCommentById: jest.fn(),
   },
-  User: {},
-  Post: {},
 }));
 
 describe('GET /get-comment/:id', () => {
   it('should retrieve a comment by ID successfully', async () => {
-    const comment = { id: 1, content: 'Great post!', userId: 1, postId: 1 };
+    const commentId = 1;
+    const comment = { id: commentId, content: 'Comment content' };
 
-    (Comment.findByPk as jest.Mock).mockResolvedValue(comment);
+    (Comment.getCommentById as jest.Mock).mockResolvedValue(comment);
 
     const response = await request(app)
-      .get('/get-comment/1');
+      .get(`/get-comment/${commentId}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(comment);
   });
 
-  it('should handle comment not found', async () => {
-    (Comment.findByPk as jest.Mock).mockResolvedValue(null);
+  it('should return 404 if comment is not found', async () => {
+    const commentId = 1;
+
+    (Comment.getCommentById as jest.Mock).mockResolvedValue(null);
 
     const response = await request(app)
-      .get('/get-comment/1');
+      .get(`/get-comment/${commentId}`);
 
     expect(response.status).toBe(404);
     expect(response.body.message).toBe('Comment not found');
   });
 
-  it('should handle server error', async () => {
-    (Comment.findByPk as jest.Mock).mockRejectedValue(new Error('Find failed'));
+  it('should handle server error on retrieving a comment', async () => {
+    const commentId = 1;
+
+    (Comment.getCommentById as jest.Mock).mockRejectedValue(new Error('Server error'));
 
     const response = await request(app)
-      .get('/get-comment/1');
+      .get(`/get-comment/${commentId}`);
 
     expect(response.status).toBe(500);
     expect(response.text).toBe('Server Error');

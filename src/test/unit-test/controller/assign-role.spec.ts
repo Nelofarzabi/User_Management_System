@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
 import userController from '../../../controllers/userController';
-import { UserRole } from '../../../models'; 
+import { User } from '../../../models'; 
+
 
 jest.mock('../../../models', () => ({
-  UserRole: {
-    create: jest.fn(),
+  User: {
+    assignRoleToUser: jest.fn(), 
   },
 }));
 
@@ -32,7 +33,7 @@ describe('UserController', () => {
   describe('assignRole', () => {
     it('should assign a role successfully', async () => {
       req.body = { userId: 1, roleId: 2 };
-      (UserRole.create as jest.Mock).mockResolvedValue(undefined); 
+      (User.assignRoleToUser as jest.Mock).mockResolvedValue(undefined); 
 
       await userController.assignRole(req as Request, res as Response);
 
@@ -42,8 +43,7 @@ describe('UserController', () => {
 
     it('should handle server error', async () => {
       req.body = { userId: 1, roleId: 2 };
-      (UserRole.create as jest.Mock).mockRejectedValue(new Error('Database error')); 
-
+      (User.assignRoleToUser as jest.Mock).mockRejectedValue(new Error('Database error')); 
       await userController.assignRole(req as Request, res as Response);
 
       expect(statusMock).toHaveBeenCalledWith(500); 
@@ -51,4 +51,3 @@ describe('UserController', () => {
     });
   });
 });
-
